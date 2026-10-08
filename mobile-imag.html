@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Imaginarium Formaturas</title>
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Imaginarium">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+  :root{
+    --ouro:#b8893a; --ouro-esc:#8f6a28; --ouro-claro:#f6edd9;
+    --tinta:#1c1c1a; --cinza:#6b6b66; --linha:#e6e2d9; --fundo:#ffffff;
+    --ok:#1f7a4d; --erro:#b3261e; --erro-fundo:#fdecea;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--fundo);color:var(--tinta);min-height:100vh;min-height:100dvh;font-size:17px;line-height:1.4}
+  .app{max-width:480px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom))}
+  .topo{text-align:center;padding:8px 0 4px}
+  .topo img{width:190px;max-width:60%;height:auto}
+  .card{background:#fff;border:1px solid var(--linha);border-radius:16px;padding:20px 18px;margin-top:14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  h1{font-size:22px;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+  h2{font-size:18px;margin:0 0 6px}
+  p{margin:0 0 12px}
+  .mut{color:var(--cinza);font-size:15px}
+  .turma-tag{display:inline-block;background:var(--ouro-claro);color:var(--ouro-esc);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:600;margin:2px 0 14px}
+  label{display:block;font-weight:600;font-size:15px;margin:14px 0 6px}
+  input[type=text]{width:100%;font:inherit;font-size:17px;padding:14px 14px;border:1.5px solid var(--linha);border-radius:12px;background:#fff;color:var(--tinta);outline:none;appearance:none;-webkit-appearance:none}
+  input[type=text]:focus{border-color:var(--ouro);box-shadow:0 0 0 3px rgba(184,137,58,.18)}
+  .dica{font-size:14px;color:var(--cinza);margin-top:6px}
+  .dica.ig{color:var(--ouro-esc);font-weight:500}
+  .ig-wrap{position:relative}
+  .ig-wrap span{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cinza);font-size:17px;pointer-events:none}
+  .ig-wrap input{padding-left:32px}
+  .btn{display:block;width:100%;font:inherit;font-size:17px;font-weight:700;padding:15px 16px;border-radius:12px;border:none;cursor:pointer;text-align:center;text-decoration:none;margin-top:12px}
+  .btn-ouro{background:var(--ouro);color:#fff}
+  .btn-ouro:active{background:var(--ouro-esc)}
+  .btn-ouro[disabled]{opacity:.55}
+  .btn-sec{background:#fff;color:var(--tinta);border:1.5px solid var(--linha)}
+  .btn-wa{background:#1f9d55;color:#fff}
+  .btn-link{background:none;border:none;color:var(--ouro-esc);font:inherit;font-size:15px;font-weight:600;text-decoration:underline;padding:12px 4px;cursor:pointer;display:block;margin:6px auto 0}
+  .lista{margin:12px 0 0;padding:0;list-style:none}
+  .lista li{border:1.5px solid var(--linha);border-radius:12px;margin-bottom:8px;background:#fff}
+  .lista button{width:100%;text-align:left;font:inherit;background:none;border:none;padding:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--tinta);font-size:16px;font-weight:600}
+  .lista button:active{background:var(--ouro-claro)}
+  .lista .ja{font-size:12px;font-weight:600;color:var(--ok);background:#e6f4ec;border-radius:999px;padding:3px 9px;white-space:nowrap}
+  .nome-grande{font-size:24px;font-weight:700;margin:6px 0 4px;letter-spacing:-.01em;word-break:break-word}
+  .erro{background:var(--erro-fundo);color:var(--erro);border-radius:10px;padding:10px 12px;font-size:15px;margin-top:12px}
+  .aviso{background:var(--ouro-claro);border:1px solid #ead9b0;border-radius:12px;padding:14px;margin-top:14px;font-size:15px}
+  .aviso strong{display:block;margin-bottom:4px}
+  .ok-icone{width:64px;height:64px;border-radius:50%;background:#e6f4ec;color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:34px;margin:4px auto 12px}
+  .resumo{border-top:1px solid var(--linha);margin-top:14px;padding-top:6px}
+  .resumo div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--linha);font-size:16px}
+  .resumo div span:first-child{color:var(--cinza)}
+  .resumo div span:last-child{font-weight:600;text-align:right;word-break:break-word}
+  .centro{text-align:center}
+  .rodape{text-align:center;color:var(--cinza);font-size:13px;margin-top:22px}
+  .oculto{display:none!important}
+  .carregando{text-align:center;color:var(--cinza);padding:26px 0}
+  .passos{display:flex;gap:6px;margin:0 0 14px}
+  .passos i{flex:1;height:4px;border-radius:2px;background:var(--linha)}
+  .passos i.on{background:var(--ouro)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topo"><img src="logo.png" alt="Imaginarium Formaturas"></div>
+
+  <!-- Carregando -->
+  <div id="tCarregando" class="card carregando">Carregando…</div>
+
+  <!-- Link inválido -->
+  <div id="tInvalido" class="card oculto centro">
+    <h1>Link não encontrado</h1>
+    <p class="mut">Abra o link que a Imaginarium enviou para a sua turma. Se o problema continuar, fale com a gente.</p>
+    <a class="btn btn-wa" id="btnWaInvalido" target="_blank" rel="noopener">Falar com a Imaginarium</a>
+  </div>
+
+  <!-- 1. Busca -->
+  <div id="tBusca" class="card oculto">
+    <div class="passos"><i class="on"></i><i></i><i></i></div>
+    <h1>Olá, formando! 🎓</h1>
+    <div class="turma-tag" id="turmaTag"></div>
+    <p class="mut">Vamos conferir seu cadastro. Digite seu nome para encontrá-lo na lista da sua turma.</p>
+    <label for="inNome">Seu nome</label>
+    <input type="text" id="inNome" autocomplete="off" autocapitalize="words" enterkeyhint="search" placeholder="Digite seu nome">
+    <div id="buscaMsg" class="dica"></div>
+    <ul class="lista" id="listaResultados"></ul>
+    <button type="button" class="btn-link oculto" id="btnNaoEncontrei">Não encontrei meu nome</button>
+  </div>
+
+  <!-- 2. Confirmar nome -->
+  <div id="tNome" class="card oculto">
+    <div class="passos"><i class="on"></i><i class="on"></i><i></i></div>
+    <p class="mut" style="margin-bottom:2px">Seu nome no cadastro está correto?</p>
+    <div class="nome-grande" id="nomeCadastro"></div>
+    <div id="blocoNomeOk">
+      <button type="button" class="btn btn-ouro" id="btnNomeOk">✔ Está correto</button>
+      <button type="button" class="btn btn-sec" id="btnNomeCorrigir">Corrigir nome</button>
+    </div>
+    <div id="blocoCorrigir" class="oculto">
+      <label for="inNomeCorrigido">Escreva seu nome completo correto</label>
+      <input type="text" id="inNomeCorrigido" autocomplete="off" autocapitalize="words" placeholder="Nome completo">
+      <div id="erroNome" class="erro oculto"></div>
+      <button type="button" class="btn btn-ouro" id="btnNomeCorrigido">Continuar</button>
+      <button type="button" class="btn-link" id="btnVoltarNome">Voltar</button>
+    </div>
+    <button type="button" class="btn-link" id="btnTrocarPessoa">Não sou eu / voltar à busca</button>
+  </div>
+
+  <!-- 3. Foto e Instagram -->
+  <div id="tDados" class="card oculto">
+    <div class="passos"><i class="on"></i><i class="on"></i><i class="on"></i></div>
+    <h1>Quase lá!</h1>
+    <p class="mut" id="dadosNome"></p>
+    <label for="inFoto">Foto escolhida para o convite</label>
+    <input type="text" id="inFoto" autocomplete="off" maxlength="120" placeholder="Ex.: Foto 23">
+    <div class="dica">Ex.: Foto 23 da pasta do convite</div>
+
+    <label for="inInsta">Seu Instagram <span class="mut" style="font-weight:400">(opcional)</span></label>
+    <div class="ig-wrap"><span>@</span><input type="text" id="inInsta" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="40" placeholder="seu.usuario"></div>
+    <div class="dica ig">Quem informar o Instagram receberá promoções exclusivas pelo Instagram da Imaginarium. 🎁</div>
+
+    <div id="erroDados" class="erro oculto"></div>
+
+    <div id="avisoSemInsta" class="aviso oculto">
+      <strong>Tem certeza?</strong>
+      Teremos promoções via Instagram só para quem informar o usuário.
+      <button type="button" class="btn btn-ouro" id="btnInformarInsta">Informar agora</button>
+      <button type="button" class="btn btn-sec" id="btnEnviarSemInsta">Enviar sem Instagram</button>
+    </div>
+
+    <button type="button" class="btn btn-ouro" id="btnEnviar">Enviar</button>
+    <button type="button" class="btn-link" id="btnVoltarDados">Voltar</button>
+  </div>
+
+  <!-- 4. Obrigado -->
+  <div id="tObrigado" class="card oculto centro">
+    <div class="ok-icone">✓</div>
+    <h1>Recebemos, obrigado!</h1>
+    <p class="mut">Seu cadastro foi registrado.</p>
+    <div class="resumo" id="resumo"></div>
+    <p class="mut" style="margin-top:16px;font-size:14px">Se algo estiver errado, é só falar com a gente pelo botão abaixo.</p>
+    <a class="btn btn-wa" id="btnWaOk" target="_blank" rel="noopener">Falar com a Imaginarium</a>
+  </div>
+
+  <!-- 5. Já respondeu -->
+  <div id="tJaRespondeu" class="card oculto centro">
+    <div class="ok-icone">✓</div>
+    <h1>Você já respondeu</h1>
+    <p class="mut" id="jaNome"></p>
+    <p class="mut">Seu cadastro já foi registrado. Se precisar fazer um novo cadastro, avise a gente:</p>
+    <a class="btn btn-wa" id="btnWaNovo" target="_blank" rel="noopener">Quero fazer um novo cadastro</a>
+    <button type="button" class="btn-link" id="btnJaVoltar">Voltar à busca</button>
+  </div>
+
+  <!-- 6. Nome não encontrado -->
+  <div id="tNaoEncontrei" class="card oculto">
+    <h1>Não achou seu nome?</h1>
+    <p class="mut">Sem problema! Escreva seu nome completo e a Imaginarium vai verificar o seu cadastro.</p>
+    <label for="inNomeAviso">Nome completo</label>
+    <input type="text" id="inNomeAviso" autocomplete="off" autocapitalize="words" placeholder="Nome completo">
+    <div id="erroAviso" class="erro oculto"></div>
+    <button type="button" class="btn btn-ouro" id="btnEnviarAviso">Enviar aviso</button>
+    <button type="button" class="btn-link" id="btnVoltarAviso">Voltar</button>
+  </div>
+
+  <!-- 7. Aviso enviado -->
+  <div id="tAvisoOk" class="card oculto centro">
+    <div class="ok-icone">✓</div>
+    <h1>Aviso enviado</h1>
+    <p class="mut">Recebemos o seu nome. A Imaginarium vai conferir o cadastro e entrar em contato.</p>
+    <a class="btn btn-wa" id="btnWaAviso" target="_blank" rel="noopener">Falar com a Imaginarium</a>
+  </div>
+
+  <div class="rodape">Imaginarium Formaturas</div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SUPABASE_URL = 'https://gqgxekjcmnostlxgfvlg.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_UBuz0ZvBKbFmGR9JCNCwEw_nlo4xIDc';
+  var WHATS = '5548996453000';
+
+  var estado = { token: null, turma: null, formando: null, nomeFinal: null, nomeCorrigido: null, timer: null, seq: 0, enviando: false };
+
+  function $(id) { return document.getElementById(id); }
+
+  // ---------- util ----------
+  function nomeBonito(s) {
+    var peq = { de: 1, da: 1, do: 1, das: 1, dos: 1, e: 1 };
+    return String(s || '').toLowerCase().replace(/\s+/g, ' ').trim().split(' ').map(function (w, i) {
+      if (i > 0 && peq[w]) return w;
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(' ');
+  }
+  function textoTurma(t) {
+    if (!t) return '';
+    var partes = [];
+    if (t.faculdade) partes.push(t.faculdade);
+    var c = t.curso || '';
+    if (t.ident) c += ' (' + (String(t.ident).length <= 2 ? 'Turma ' + t.ident : t.ident) + ')';
+    if (c) partes.push(c);
+    return partes.join(' · ');
+  }
+  function linkWhats(msg) { return 'https://wa.me/' + WHATS + '?text=' + encodeURIComponent(msg); }
+  function mostrar(id) {
+    ['tCarregando', 'tInvalido', 'tBusca', 'tNome', 'tDados', 'tObrigado', 'tJaRespondeu', 'tNaoEncontrei', 'tAvisoOk'].forEach(function (t) {
+      $(t).classList.toggle('oculto', t !== id);
+    });
+    window.scrollTo(0, 0);
+  }
+  function erro(elId, msg) {
+    var e = $(elId);
+    if (!msg) { e.classList.add('oculto'); e.textContent = ''; return; }
+    e.textContent = msg; e.classList.remove('oculto');
+  }
+  function rpc(nome, args) {
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + nome, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+      body: JSON.stringify(args)
+    }).then(function (r) {
+      if (!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    });
+  }
+  function normalizarInsta(v) {
+    v = String(v || '').trim().toLowerCase();
+    v = v.replace(/^(https?:\/\/)?(www\.)?instagram\.com\//, '').replace(/[\/?].*$/, '').replace(/^@+/, '');
+    return v;
+  }
+  function instaValido(v) { return v === '' || /^[a-z0-9._]{1,30}$/.test(v); }
+
+  // ---------- token ----------
+  function lerToken() {
+    var t = null;
+    try { t = new URLSearchParams(location.search).get('t'); } catch (e) {}
+    try {
+      if (t) localStorage.setItem('imag_token', t);
+      else t = localStorage.getItem('imag_token');
+    } catch (e) {}
+    return t;
+  }
+
+  // ---------- busca ----------
+  function onDigitar() {
+    var termo = $('inNome').value.trim();
+    clearTimeout(estado.timer);
+    var lista = $('listaResultados');
+    if (termo.length < 3) {
+      lista.innerHTML = '';
+      $('buscaMsg').textContent = termo.length ? 'Digite pelo menos 3 letras.' : '';
+      $('btnNaoEncontrei').classList.toggle('oculto', termo.length < 3);
+      return;
+    }
+    $('buscaMsg').textContent = 'Buscando…';
+    estado.timer = setTimeout(function () { buscar(termo); }, 300);
+  }
+  function buscar(termo) {
+    var meu = ++estado.seq;
+    rpc('mobile_buscar', { p_token: estado.token, p_termo: termo }).then(function (r) {
+      if (meu !== estado.seq) return;
+      var lista = $('listaResultados');
+      lista.innerHTML = '';
+      if (!r || !r.ok) { $('buscaMsg').textContent = 'Não foi possível buscar agora. Tente novamente.'; return; }
+      var itens = r.itens || [];
+      $('buscaMsg').textContent = itens.length ? 'Toque no seu nome:' : 'Nenhum nome encontrado com essas letras.';
+      itens.forEach(function (it) {
+        var li = document.createElement('li');
+        var b = document.createElement('button');
+        b.type = 'button';
+        var s = document.createElement('span');
+        s.textContent = nomeBonito(it.nome);
+        b.appendChild(s);
+        if (it.respondido) {
+          var j = document.createElement('span'); j.className = 'ja'; j.textContent = 'já respondeu'; b.appendChild(j);
+        }
+        b.addEventListener('click', function () { escolher(it); });
+        li.appendChild(b); lista.appendChild(li);
+      });
+      $('btnNaoEncontrei').classList.remove('oculto');
+    }).catch(function () {
+      if (meu !== estado.seq) return;
+      $('buscaMsg').textContent = 'Sem conexão. Verifique a internet e tente novamente.';
+    });
+  }
+  function escolher(it) {
+    estado.formando = it;
+    estado.nomeFinal = nomeBonito(it.nome);
+    estado.nomeCorrigido = null;
+    if (it.respondido) {
+      $('jaNome').textContent = estado.nomeFinal;
+      var msg = 'Olá! Sou ' + estado.nomeFinal + ' (' + textoTurma(estado.turma) + '). Já respondi o cadastro, mas gostaria de fazer um novo cadastro.';
+      $('btnWaNovo').href = linkWhats(msg);
+      mostrar('tJaRespondeu');
+      return;
+    }
+    $('nomeCadastro').textContent = estado.nomeFinal;
+    $('blocoNomeOk').classList.remove('oculto');
+    $('blocoCorrigir').classList.add('oculto');
+    $('inNomeCorrigido').value = '';
+    erro('erroNome', '');
+    mostrar('tNome');
+  }
+
+  // ---------- nome ----------
+  function irParaDados(nomeOk) {
+    estado.nomeOk = nomeOk;
+    $('dadosNome').textContent = estado.nomeCorrigido ? estado.nomeCorrigido : estado.nomeFinal;
+    $('avisoSemInsta').classList.add('oculto');
+    $('btnEnviar').classList.remove('oculto');
+    erro('erroDados', '');
+    mostrar('tDados');
+  }
+
+  // ---------- envio ----------
+  function validarDados() {
+    erro('erroDados', '');
+    var foto = $('inFoto').value.trim();
+    if (!foto) { erro('erroDados', 'Informe a foto escolhida para o convite.'); $('inFoto').focus(); return null; }
+    var ig = normalizarInsta($('inInsta').value);
+    if (!instaValido(ig)) { erro('erroDados', 'Instagram inválido. Use só letras, números, ponto e underline (até 30 caracteres).'); $('inInsta').focus(); return null; }
+    return { foto: foto, ig: ig };
+  }
+  function onEnviar() {
+    var d = validarDados();
+    if (!d) return;
+    if (!d.ig) {
+      $('avisoSemInsta').classList.remove('oculto');
+      $('btnEnviar').classList.add('oculto');
+      $('avisoSemInsta').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    enviar(d);
+  }
+  function enviar(d) {
+    if (estado.enviando) return;
+    estado.enviando = true;
+    ['btnEnviar', 'btnEnviarSemInsta', 'btnInformarInsta'].forEach(function (i) { $(i).disabled = true; });
+    $('btnEnviar').textContent = 'Enviando…';
+    rpc('mobile_responder', {
+      p_token: estado.token,
+      p_id: estado.formando.id,
+      p_nome_ok: !estado.nomeCorrigido,
+      p_nome_corrigido: estado.nomeCorrigido,
+      p_foto: d.foto,
+      p_instagram: d.ig
+    }).then(function (r) {
+      estado.enviando = false;
+      ['btnEnviar', 'btnEnviarSemInsta', 'btnInformarInsta'].forEach(function (i) { $(i).disabled = false; });
+      $('btnEnviar').textContent = 'Enviar';
+      if (r && r.ok) { finalizar(d, r.instagram); return; }
+      var e = r && r.erro;
+      if (e === 'ja_respondeu') { escolher({ id: estado.formando.id, nome: estado.formando.nome, respondido: true }); return; }
+      var msgs = { foto: 'Informe a foto escolhida para o convite.', instagram: 'Instagram inválido.', nome: 'Informe o nome correto.', link: 'Link inválido. Peça um novo link à Imaginarium.', formando: 'Cadastro não encontrado nesta turma.' };
+      $('avisoSemInsta').classList.add('oculto'); $('btnEnviar').classList.remove('oculto');
+      erro('erroDados', msgs[e] || 'Não foi possível enviar. Tente novamente.');
+    }).catch(function () {
+      estado.enviando = false;
+      ['btnEnviar', 'btnEnviarSemInsta', 'btnInformarInsta'].forEach(function (i) { $(i).disabled = false; });
+      $('btnEnviar').textContent = 'Enviar';
+      $('avisoSemInsta').classList.add('oculto'); $('btnEnviar').classList.remove('oculto');
+      erro('erroDados', 'Sem conexão. Verifique a internet e toque em Enviar novamente.');
+    });
+  }
+  function linha(k, v) {
+    var d = document.createElement('div');
+    var a = document.createElement('span'); a.textContent = k;
+    var b = document.createElement('span'); b.textContent = v;
+    d.appendChild(a); d.appendChild(b); return d;
+  }
+  function finalizar(d, igSalvo) {
+    var r = $('resumo'); r.innerHTML = '';
+    r.appendChild(linha('Nome', estado.nomeCorrigido ? estado.nomeCorrigido + ' (correção enviada)' : estado.nomeFinal + ' ✔'));
+    r.appendChild(linha('Foto escolhida', d.foto));
+    r.appendChild(linha('Instagram', igSalvo ? '@' + igSalvo : 'não informado'));
+    var msg = 'Olá! Sou ' + estado.nomeFinal + ' (' + textoTurma(estado.turma) + '). Já enviei meu cadastro, mas preciso falar com vocês.';
+    $('btnWaOk').href = linkWhats(msg);
+    mostrar('tObrigado');
+  }
+
+  // ---------- não encontrei ----------
+  function enviarAviso() {
+    var n = $('inNomeAviso').value.trim();
+    erro('erroAviso', '');
+    if (n.length < 3) { erro('erroAviso', 'Escreva seu nome completo.'); return; }
+    $('btnEnviarAviso').disabled = true;
+    rpc('mobile_nao_encontrei', { p_token: estado.token, p_nome: n }).then(function (r) {
+      $('btnEnviarAviso').disabled = false;
+      if (r && r.ok) {
+        $('btnWaAviso').href = linkWhats('Olá! Sou ' + n + ' (' + textoTurma(estado.turma) + '). Não encontrei meu nome na lista do cadastro.');
+        mostrar('tAvisoOk');
+      } else erro('erroAviso', 'Não foi possível enviar. Tente novamente.');
+    }).catch(function () {
+      $('btnEnviarAviso').disabled = false;
+      erro('erroAviso', 'Sem conexão. Tente novamente.');
+    });
+  }
+
+  // ---------- eventos ----------
+  function ligar() {
+    $('inNome').addEventListener('input', onDigitar);
+    $('btnNaoEncontrei').addEventListener('click', function () { $('inNomeAviso').value = $('inNome').value; erro('erroAviso', ''); mostrar('tNaoEncontrei'); });
+    $('btnVoltarAviso').addEventListener('click', function () { mostrar('tBusca'); });
+    $('btnEnviarAviso').addEventListener('click', enviarAviso);
+
+    $('btnNomeOk').addEventListener('click', function () { estado.nomeCorrigido = null; irParaDados(true); });
+    $('btnNomeCorrigir').addEventListener('click', function () {
+      $('blocoNomeOk').classList.add('oculto'); $('blocoCorrigir').classList.remove('oculto');
+      $('inNomeCorrigido').value = estado.nomeFinal; $('inNomeCorrigido').focus();
+    });
+    $('btnVoltarNome').addEventListener('click', function () { $('blocoCorrigir').classList.add('oculto'); $('blocoNomeOk').classList.remove('oculto'); erro('erroNome', ''); });
+    $('btnNomeCorrigido').addEventListener('click', function () {
+      var n = $('inNomeCorrigido').value.trim().replace(/\s+/g, ' ');
+      if (n.length < 3) { erro('erroNome', 'Escreva o nome completo.'); return; }
+      if (n.toLowerCase() === estado.nomeFinal.toLowerCase()) { estado.nomeCorrigido = null; irParaDados(true); return; }
+      estado.nomeCorrigido = n; irParaDados(false);
+    });
+    $('btnTrocarPessoa').addEventListener('click', function () { mostrar('tBusca'); });
+
+    $('btnEnviar').addEventListener('click', onEnviar);
+    $('btnInformarInsta').addEventListener('click', function () {
+      $('avisoSemInsta').classList.add('oculto'); $('btnEnviar').classList.remove('oculto'); $('inInsta').focus();
+    });
+    $('btnEnviarSemInsta').addEventListener('click', function () { var d = validarDados(); if (d) enviar(d); });
+    $('btnVoltarDados').addEventListener('click', function () { mostrar('tNome'); });
+    $('btnJaVoltar').addEventListener('click', function () { mostrar('tBusca'); });
+  }
+
+  // ---------- início ----------
+  function iniciar() {
+    ligar();
+    var wa = linkWhats('Olá! Estou com dificuldade para abrir o link do cadastro de formandos.');
+    $('btnWaInvalido').href = wa;
+    $('btnWaAviso').href = wa;
+    $('btnWaOk').href = wa;
+    estado.token = lerToken();
+    if (!estado.token || estado.token.length < 8) { mostrar('tInvalido'); return; }
+    rpc('mobile_turma', { p_token: estado.token }).then(function (r) {
+      if (!r || !r.ok) { mostrar('tInvalido'); return; }
+      estado.turma = r;
+      $('turmaTag').textContent = textoTurma(r) || 'Formandos';
+      mostrar('tBusca');
+    }).catch(function () {
+      $('tCarregando').textContent = 'Sem conexão. Verifique a internet e abra o link novamente.';
+    });
+  }
+  iniciar();
+
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
