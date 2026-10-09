@@ -33,6 +33,8 @@
   label{display:block;font-weight:600;font-size:15px;margin:14px 0 6px}
   input[type=text]{width:100%;font:inherit;font-size:17px;padding:14px 14px;border:1.5px solid var(--linha);border-radius:12px;background:#fff;color:var(--tinta);outline:none;appearance:none;-webkit-appearance:none}
   input[type=text]:focus{border-color:var(--ouro);box-shadow:0 0 0 3px rgba(184,137,58,.18)}
+  textarea{width:100%;font:inherit;font-size:17px;padding:14px 14px;border:1.5px solid var(--linha);border-radius:12px;background:#fff;color:var(--tinta);outline:none;appearance:none;-webkit-appearance:none;resize:vertical;min-height:84px}
+  textarea:focus{border-color:var(--ouro);box-shadow:0 0 0 3px rgba(184,137,58,.18)}
   .dica{font-size:14px;color:var(--cinza);margin-top:6px}
   .dica.ig{color:var(--ouro-esc);font-weight:500}
   .ig-wrap{position:relative}
@@ -122,6 +124,9 @@
     <label for="inFoto">Foto escolhida para o convite</label>
     <input type="text" id="inFoto" autocomplete="off" maxlength="120" placeholder="Ex.: Foto 23">
     <div class="dica">Ex.: Foto 23 da pasta do convite</div>
+
+    <label for="inObs">Observações sobre a foto <span class="mut" style="font-weight:400">(opcional)</span></label>
+    <textarea id="inObs" maxlength="500" placeholder="Ex.: pedir algum ajuste, retoque ou detalhe da foto"></textarea>
 
     <label for="inInsta">Seu Instagram <span class="mut" style="font-weight:400">(opcional)</span></label>
     <div class="ig-wrap"><span>@</span><input type="text" id="inInsta" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="40" placeholder="seu.usuario"></div>
@@ -329,7 +334,7 @@
     if (!foto) { erro('erroDados', 'Informe a foto escolhida para o convite.'); $('inFoto').focus(); return null; }
     var ig = normalizarInsta($('inInsta').value);
     if (!instaValido(ig)) { erro('erroDados', 'Instagram inválido. Use só letras, números, ponto e underline (até 30 caracteres).'); $('inInsta').focus(); return null; }
-    return { foto: foto, ig: ig };
+    return { foto: foto, ig: ig, obs: $('inObs').value.trim() };
   }
   function onEnviar() {
     var d = validarDados();
@@ -353,7 +358,8 @@
       p_nome_ok: !estado.nomeCorrigido,
       p_nome_corrigido: estado.nomeCorrigido,
       p_foto: d.foto,
-      p_instagram: d.ig
+      p_instagram: d.ig,
+      p_observacao: d.obs || null
     }).then(function (r) {
       estado.enviando = false;
       ['btnEnviar', 'btnEnviarSemInsta', 'btnInformarInsta'].forEach(function (i) { $(i).disabled = false; });
