@@ -153,9 +153,15 @@
       <ol>
         <li>Abra o PDF e confira seus dados.</li>
         <li>Assine digitalmente pelo gov.br: <a href="https://assinador.iti.br/" target="_blank" rel="noopener">assinador.iti.br</a>.</li>
-        <li>Entregue o contrato assinado conforme a orientação da comissão de formatura.</li>
+        <li>Depois de assinar, use o botão verde <b>“Enviar PDF assinado no WhatsApp”</b> (no fim desta página) para mandar o PDF ao nosso financeiro.</li>
       </ol>
       <button type="button" class="btn btn-sec" id="btnCorrigir">Corrigir meus dados e gerar de novo</button>
+    </div>
+
+    <div class="card" id="cEnviar">
+      <h2>Enviar o contrato assinado</h2>
+      <p class="mut">Após assinar o PDF, clique no botão abaixo para enviar o PDF assinado ao nosso financeiro pelo WhatsApp. A mensagem já vai preenchida; é só anexar o PDF assinado.</p>
+      <a class="btn btn-ouro" id="btnZap" href="#" target="_blank" rel="noopener">Enviar PDF assinado no WhatsApp</a>
     </div>
   </div>
 
@@ -479,12 +485,21 @@
   }
   function valorDoTipo(tipo) { return tipo === 'sem_baile' ? estado.turma.valorSemBaile : estado.turma.valorCompleta; }
 
+
+  function atualizarZap() {
+    var t = estado.turma || {};
+    var nome = ($('fNome').value || '').trim();
+    var txt = 'Olá! Segue meu contrato individual assinado.\nInstituição: ' + (t.faculdade || '') + '\nCurso: ' + (t.curso || '') + '\nSemestre: ' + (t.semestre || '') + '\nNome: ' + nome;
+    $('btnZap').href = 'https://wa.me/5548999755928?text=' + encodeURIComponent(txt);
+  }
+
   function escolherTipo(tipo) {
     estado.tipo = tipo;
     Array.prototype.forEach.call(document.querySelectorAll('.tipo'), function (b) { b.classList.toggle('sel', b.getAttribute('data-tipo') === tipo); });
     $('textoContrato').innerHTML = htmlContrato({ turma: estado.turma, tipo: tipo, valor: valorDoTipo(tipo), dataIPCA: estado.turma.dataIPCA, dataMulta: estado.turma.dataMulta, d: null });
     $('cLeitura').classList.remove('oculto'); $('cDados').classList.remove('oculto');
     $('cSucesso').classList.add('oculto');
+    atualizarZap();
     $('cLeitura').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -508,6 +523,7 @@
     });
     $('fEstado').innerHTML = '<option value="">UF</option>' + UFS.map(function (u) { return '<option>' + u + '</option>'; }).join('');
     $('tCarregando').classList.add('oculto'); $('tPrincipal').classList.remove('oculto');
+    atualizarZap();
     if (tipos.length === 1) escolherTipo(tipos[0].k);
   }
 
@@ -556,6 +572,7 @@
       estado.pdfBlob = doc.output('blob'); estado.pdfNome = nomeArquivo(estado.turma, estado.tipo);
       $('cDados').classList.add('oculto'); $('cLeitura').classList.add('oculto'); $('cSucesso').classList.remove('oculto');
       $('cSucesso').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      atualizarZap();
       baixarBlob();
     }).catch(function () {
       exibirErro('Sem conexão com o servidor. Confira a internet e tente de novo.');
@@ -587,6 +604,8 @@
     $('fCep').addEventListener('input', buscarCep);
     $('btnGerar').addEventListener('click', gerar);
     $('btnBaixar').addEventListener('click', baixarBlob);
+    $('fNome').addEventListener('input', atualizarZap);
+    $('btnZap').addEventListener('click', atualizarZap);
     $('btnCorrigir').addEventListener('click', function () {
       $('cSucesso').classList.add('oculto'); $('cLeitura').classList.remove('oculto'); $('cDados').classList.remove('oculto');
       $('cDados').scrollIntoView({ behavior: 'smooth', block: 'start' });
