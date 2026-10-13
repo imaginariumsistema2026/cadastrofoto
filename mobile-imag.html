@@ -122,6 +122,7 @@
     <div class="passos"><i class="on"></i><i class="on"></i><i class="on"></i></div>
     <h1>Quase lá!</h1>
     <p class="mut" id="dadosNome"></p>
+    <div id="blocoFotoNormal">
     <div class="aviso" style="margin-top:0;margin-bottom:6px">
       <strong>Como escolher sua foto</strong>
       1. Abra a pasta de fotos que a Imaginarium enviou (link do Google Drive).<br>
@@ -132,6 +133,12 @@
     <label for="inFoto">Nome do arquivo da foto escolhida</label>
     <input type="text" id="inFoto" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="120" placeholder="Ex.: 108A9161">
     <div class="dica">Ex.: se a foto se chama 108A9161.jpg, digite 108A9161</div>
+    </div>
+    <div id="blocoFotoParticular" class="oculto">
+    <label for="inLink">Link da sua foto</label>
+    <input type="url" id="inLink" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="500" placeholder="https://...">
+    <div class="dica">Cole aqui o link (Google Drive, WeTransfer etc.) da foto que você fez com o fotógrafo.</div>
+    </div>
 
     <label for="inObs">Observações sobre a foto <span class="mut" style="font-weight:400">(opcional)</span></label>
     <textarea id="inObs" maxlength="500" placeholder="Ex.: pedir algum ajuste, retoque ou detalhe da foto"></textarea>
@@ -332,14 +339,24 @@
     $('avisoSemInsta').classList.add('oculto');
     $('btnEnviar').classList.remove('oculto');
     erro('erroDados', '');
+    var part = !!(estado.formando && estado.formando.particular);
+    $('blocoFotoNormal').classList.toggle('oculto', part);
+    $('blocoFotoParticular').classList.toggle('oculto', !part);
     mostrar('tDados');
   }
 
   // ---------- envio ----------
   function validarDados() {
     erro('erroDados', '');
-    var foto = $('inFoto').value.trim().replace(/\.(jpe?g|png|heic|webp|tiff?)$/i, '').trim();
-    if (!foto) { erro('erroDados', 'Informe a foto escolhida para o convite.'); $('inFoto').focus(); return null; }
+    var part = !!(estado.formando && estado.formando.particular);
+    var foto;
+    if (part) {
+      foto = $('inLink').value.trim();
+      if (!/^https?:\/\/[^\s]+$/i.test(foto)) { erro('erroDados', 'Cole o link completo da foto, começando com http:// ou https://'); $('inLink').focus(); return null; }
+    } else {
+      foto = $('inFoto').value.trim().replace(/\.(jpe?g|png|heic|webp|tiff?)$/i, '').trim();
+      if (!foto) { erro('erroDados', 'Informe a foto escolhida para o convite.'); $('inFoto').focus(); return null; }
+    }
     var ig = normalizarInsta($('inInsta').value);
     if (!instaValido(ig)) { erro('erroDados', 'Instagram inválido. Use só letras, números, ponto e underline (até 30 caracteres).'); $('inInsta').focus(); return null; }
     return { foto: foto, ig: ig, obs: $('inObs').value.trim() };
@@ -375,7 +392,7 @@
       if (r && r.ok) { finalizar(d, r.instagram); return; }
       var e = r && r.erro;
       if (e === 'ja_respondeu') { escolher({ id: estado.formando.id, nome: estado.formando.nome, respondido: true }); return; }
-      var msgs = { foto: 'Informe a foto escolhida para o convite.', instagram: 'Instagram inválido.', nome: 'Informe o nome correto.', link: 'Link inválido. Peça um novo link à Imaginarium.', formando: 'Cadastro não encontrado nesta turma.' };
+      var msgs = { foto: 'Informe a foto escolhida para o convite.', instagram: 'Instagram inválido.', nome: 'Informe o nome correto.', link_foto: 'Link da foto inválido. Use um endereço começando com http:// ou https://', link: 'Link inválido. Peça um novo link à Imaginarium.', formando: 'Cadastro não encontrado nesta turma.' };
       $('avisoSemInsta').classList.add('oculto'); $('btnEnviar').classList.remove('oculto');
       erro('erroDados', msgs[e] || 'Não foi possível enviar. Tente novamente.');
     }).catch(function () {
@@ -395,7 +412,7 @@
   function finalizar(d, igSalvo) {
     var r = $('resumo'); r.innerHTML = '';
     r.appendChild(linha('Nome', estado.nomeCorrigido ? estado.nomeCorrigido + ' (correção enviada)' : estado.nomeFinal + ' ✔'));
-    r.appendChild(linha('Foto escolhida', d.foto));
+    r.appendChild(linha('Foto escolhida', estado.formando && estado.formando.particular ? 'Foto particular (link enviado)' : d.foto));
     r.appendChild(linha('Instagram', igSalvo ? '@' + igSalvo : 'não informado'));
     var msg = 'Olá! Sou ' + estado.nomeFinal + ' (' + textoTurma(estado.turma) + '). Já enviei meu cadastro, mas preciso falar com vocês.';
     $('btnWaOk').href = linkWhats(msg);
